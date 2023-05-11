@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find taiga_software)/launch/drivers/tf_transforms.launch"/>
+
+  <include file="$(find taiga_vision)/launch/drivers/start_lslidar_c16.launch"/>
+
+  <include file="$(find taiga_vision)/launch/drivers/start_rs_camera.launch"/>
+  
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find taiga_vision)/rviz/full_view_rs_lidar.rviz" output="screen"/>
+
+</launch>
