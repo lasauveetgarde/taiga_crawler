@@ -3,7 +3,9 @@
 
   <include file="$(find taiga_software)/launch/drivers/tf_transforms.launch"/>
 
-  <include file="$(find taiga_vision)/launch/drivers/start_lslidar_c16.launch"/>
+  <!-- <include file="$(find taiga_vision)/launch/drivers/start_lslidar_c16.launch"/> -->
+  <include file="$(find taiga_vision)/launch/drivers/start_lslidar_official_c16.launch"/>
+
 
   <include file="$(find taiga_vision)/launch/drivers/start_rs_camera.launch"/>
   

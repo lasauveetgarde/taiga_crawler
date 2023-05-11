@@ -2,12 +2,14 @@
 
 <launch>
     <!-- BaseFootprint - frame on ground level near rear wheels axis -->
-    <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_link" args="0 0 0 0 0 0 /base_footprint /base_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_link" args="0 0 0.36 0 0 0 /base_footprint /base_link 100" />
     <!-- <node pkg="tf" type="static_transform_publisher" name="tf_base_footprint_2_front_axis_link" args="1.65 0 0 0 0 0 /base_link /base_front_axis_link 1000" /> -->
     
     <!-- camera-->
-    <node pkg="tf" type="static_transform_publisher" name="tf_front_camera" args="0 -0.015 0.71 0 -0.13 0 /base_link /rs_camera_link 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_bl_2_lidar" args="1.02 0.0 1.40 1.57 0.0 0 /base_link /laser_link 100" />
+    
+    <node pkg="tf" type="static_transform_publisher" name="tf_bl_2_cam" args="1.02 -0.12 1.52 0 0.0 0 /base_link /rs_camera_link 100" />
+
 
     <!--lidar-->
-    <node pkg="tf" type="static_transform_publisher" name="tf_front_axis_2_lidar" args="0.76 0 -0.175 0 0 3.14159265 /base_link /lslidar_link 1000" />
 </launch>
