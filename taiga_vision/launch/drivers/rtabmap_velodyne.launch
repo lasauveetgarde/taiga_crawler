@@ -16,7 +16,7 @@
     <arg name="scan_20_hz"    default="false"/> <!-- If we launch the velodyne with "rpm:=1200" argument -->
     <arg name="deskewing"     default="false"/>
     <arg name="slerp"         default="false"/> <!-- If true, a slerp between the first and last time will be used to deskew each point, which is faster than using tf for every point but less accurate -->
-    <arg name="scan_topic"    default="/lslidar_point_cloud"/>
+    <arg name="scan_topic"    default="/lslidar_point_cloud/filtered"/>
     <arg name="use_sim_time"  default="false"/>
     <param if="$(arg use_sim_time)" name="use_sim_time" value="true"/>
 
@@ -26,15 +26,15 @@
     <arg name="queue_size_odom" default="1"/>
     <arg name="loop_ratio"      default="0.2"/>
 
-    <arg name="resolution"         default="0.05"/> <!-- set 0.05-0.3 for indoor, set 0.3-0.5 for outdoor -->
+    <arg name="resolution"         default="0.4"/> <!-- set 0.05-0.3 for indoor, set 0.3-0.5 for outdoor -->
     <arg name="iterations"         default="10"/>
 
     <!-- Grid parameters -->
-    <arg name="ground_is_obstacle" default="true"/>
+    <arg name="ground_is_obstacle" default="false"/>
     <arg name="grid_max_range"     default="20"/>
 
     <!-- For F2M Odometry -->
-    <arg name="ground_normals_up" default="false"/> <!-- set to true when velodyne is always horizontal to ground (ground robot, car) -->
+    <arg name="ground_normals_up" default="true"/> <!-- set to true when velodyne is always horizontal to ground (ground robot, car) -->
     <arg name="local_map_size"    default="15000"/>
     <arg name="key_frame_thr"     default="0.4"/>
 
@@ -143,6 +143,8 @@
         <remap from="rgb/image" to="/rs_camera/color/image_raw"/>
         <remap from="rgb/camera_info" to="/rs_camera/color/camera_info"/>
         <remap from="imu"        to="$(arg imu_topic)/filtered"/>
+        <remap from="gps/fix"        to="/ublox/fix"/>
+
 
         <!-- RTAB-Map's parameters -->
         <param name="Rtabmap/DetectionRate"          type="string" value="1"/>

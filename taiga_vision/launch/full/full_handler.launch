@@ -6,10 +6,27 @@
     <arg name="out_topic" value="rs_camera/imu/filtered" />
   </include> -->
 
-  <include file="$(find taiga_vision)/launch/drivers/rtabmap_velodyne.launch"></include>
-
+  <!-- <include file="$(find taiga_vision)/launch/drivers/rtabmap_velodyne.launch"></include> -->
+  <include file="$(find taiga_vision)/launch/drivers/rtabmap_my.launch"></include>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find taiga_vision)/rviz/full_view_rs_lidar.rviz" output="screen"/>
-  </launch>
+
+
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+  <!-- Run a passthrough filter to clean NaNs -->
+  <node pkg="nodelet" type="nodelet" name="passthrough" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="/lslidar_point_cloud" />
+    <remap from="~output" to="/lslidar_point_cloud/filtered" />
+
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -0.5
+      filter_limit_max: 20.0
+      filter_limit_negative: True
+    </rosparam>
+  </node>
+
+ </launch>
+
 
 <!-- /rs_camera/depth/color/points -->

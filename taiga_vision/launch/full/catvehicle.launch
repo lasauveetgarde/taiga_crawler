@@ -39,7 +39,7 @@
 
     <!-- Common parameters -->
     <arg name="common_args" value="
-                --Rtabmap/DetectionRate 2
+                --Rtabmap/DetectionRate 1
                 --Mem/STMSize 30
                 --Mem/LaserScanNormalK 10
                 --OdomF2M/ScanMaxSize 30000
@@ -96,15 +96,18 @@
         <arg     if="$(arg lidar)" name="odom_topic" value="lidar_odom"/>
         <arg unless="$(arg lidar)" name="odom_topic" value="visual_odom"/>
 
-        <arg name="odom_guess_frame_id" value="catvehicle/odom"/>
-        <arg name="frame_id"            value="catvehicle/base_link"/>
+        <arg name="odom_guess_frame_id" value="/odom"/>
+        <arg name="frame_id"            value="/base_link"/>
         <arg name="map_frame_id"        value="catvehicle/map"/>
         <arg     if="$(arg lidar)" name="vo_frame_id" value="catvehicle/lidar_odom"/>
         <arg unless="$(arg lidar)" name="vo_frame_id" value="catvehicle/visual_odom"/>
 
         <arg name="stereo_namespace"  value="/catvehicle/triclops"/>
-        <arg name="right_image_topic" value="/catvehicle/triclops/right/image_rect_color"/>
-        <arg name="scan_cloud_topic"  value="/catvehicle/velodyne_points"/>
+        <!-- <arg name="right_image_topic" value="/catvehicle/triclops/right/image_rect_color"/>
+        <arg name="scan_cloud_topic"  value="/catvehicle/velodyne_points"/> -->
+        <arg name="right_image_topic" value="/rs_camera/color/image_raw"/>
+        <arg name="scan_cloud_topic"  value="/lslidar_point_cloud"/>
+
         <arg name="rgbd_sync"         value="$(arg camera)"/>
         <arg name="approx_rgbd_sync"  value="false"/>
         <arg name="approx_sync"       value="$(eval camera and lidar)"/>
