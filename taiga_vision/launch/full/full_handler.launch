@@ -1,15 +1,22 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- <include file="$(find taiga_software)/launch/drivers/imu_filter.launch">
+  <include file="$(find taiga_software)/launch/drivers/imu_filter.launch">
     <arg name="in_topic" value="rs_camera/imu" />
     <arg name="out_topic" value="rs_camera/imu/filtered" />
-  </include> -->
+  </include>
 
   <!-- <include file="$(find taiga_vision)/launch/drivers/rtabmap_velodyne.launch"></include> -->
   <include file="$(find taiga_vision)/launch/drivers/rtabmap_my.launch"></include>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find taiga_vision)/rviz/full_view_rs_lidar.rviz" output="screen"/>
+
+
+
+  <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true" output="screen">
+    <rosparam command="load" file="$(find taiga_software)/config/ekf/ukf_vo.yaml" />
+    <remap from="odometry/filtered" to="taiga/odometry/filtered/local" />
+  </node>
 
 
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />

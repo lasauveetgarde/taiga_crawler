@@ -1,11 +1,18 @@
 <launch>
 
 <arg name="rtabmapviz"   default="true"/>
+<arg name="localization" default="true" />
 <arg name="imu_topic"       default="/rs_camera/imu"/>
 <arg name="frame_id"        default="base_footprint"/>       <!-- base frame of the robot: for this example, we use velodyne as base frame -->
 <arg name="queue_size"      default="10"/>
 <arg name="queue_size_odom" default="1"/>
 <arg name="loop_ratio"      default="0.2"/>
+
+<arg name="database_path" default="$(find taiga_maps)/3d_maps/new_map.db" />
+
+
+<arg if="$(arg localization)" name="args" default="" />
+<arg unless="$(arg localization)" name="args" default="--delete_db_on_start" />
 
 <arg name="resolution"         default="0.4"/> <!-- set 0.05-0.3 for indoor, set 0.3-0.5 for outdoor -->
 <arg name="iterations"         default="10"/>
@@ -13,6 +20,13 @@
 <!-- Grid parameters -->
 <arg name="ground_is_obstacle" default="false"/>
 <arg name="grid_max_range"     default="20"/>
+
+<!-- Generate depth image from scan_cloud -->
+<arg name="gen_depth"                  default="true" /> 
+<arg name="gen_depth_decimation"       default="1" />
+<arg name="gen_depth_fill_holes_size"  default="0" />
+<arg name="gen_depth_fill_iterations"  default="1" />
+<arg name="gen_depth_fill_holes_error" default="0.1" />
 
   <group ns="rtabmap">
     
@@ -32,9 +46,10 @@
       <param name="subscribe_rgbd" type="bool"   value="true"/>
       <param name="frame_id"       type="string" value="base_footprint"/>
       <remap from="rgbd_image" to="rgbd_image"/>
-      <!-- <remap from="odom"            to="/agv/vo"/> -->
+      
+      <remap from="odom"            to="/taiga/vo"/>
         <!-- <remap from="imu" to="$(arg imu_topic)" /> -->
-        <param name="publish_tf"             type="bool"   value="true"/>
+        <param name="publish_tf"             type="bool"   value="false"/>
         <param name="publish_null_when_lost" type="bool"   value="true"/>
         <param name="Reg/Force3DoF" type="bool" value="true" />
         <param name="Odom/FillInfoData"      type="string" value="true"/>
@@ -42,27 +57,11 @@
         <param name="OdomF2M/MaxSize"        type="string" value="1000"/>
     </node>
 
-    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="--delete_db_on_start">
-          <!-- <param name="frame_id"        type="string" value="base_footprint"/>
-          <param name="subscribe_depth" type="bool"   value="false"/>
-          <param name="subscribe_rgbd"  type="bool"   value="true"/>
-          <param name="subscribe_scan_cloud" type="bool" value="false"/>
+    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg args)">
 
-
-          <remap from="odom"       to="odom"/>
-          <remap from="rgbd_image" to="rgbd_image"/>
-          
-
-          <param name="queue_size"  type="int"  value="10"/>
-          <param name="approx_sync" type="bool" value="false"/>
-
-          RTAB-Map's parameters
-          <param name="RGBD/AngularUpdate"        type="string" value="0.01"/>
-          <param name="RGBD/LinearUpdate"         type="string" value="0.01"/>
-          <param name="RGBD/OptimizeFromGraphEnd" type="string" value="false"/> -->
-
-
+        <param name="database_path" type="string" value="$(arg database_path)" />
         <param name="frame_id"        type="string" value="base_footprint"/>
+        <param name="odom_frame_id" type="string" value="odom" />
 
         <param name="subscribe_depth"      type="bool" value="false"/>
         <param name="subscribe_rgb"        type="bool" value="true"/>
@@ -75,6 +74,8 @@
         <remap from="rgb/camera_info" to="/rs_camera/color/camera_info"/>
         <!-- <remap from="imu"        to="$(arg imu_topic)/filtered"/> -->
         <remap from="gps/fix"        to="/ublox/fix"/>
+        <remap from="odom"            to="/taiga/odometry/filtered/local"/>
+
 
 
         <!-- RTAB-Map's parameters -->
@@ -88,6 +89,7 @@
         <param name="Mem/NotLinkedNodesKept"         type="string" value="false"/>
         <param name="Mem/STMSize"                    type="string" value="30"/>
         <param name="Mem/LaserScanNormalK"           type="string" value="20"/>
+        <param name="Vis/MinInliers" type="string" value="10"/> 
 
         <param name="Reg/Strategy"                   type="string" value="1"/>
         <param name="Grid/CellSize"                  type="string" value="$(arg resolution)"/>
@@ -98,9 +100,6 @@
         <param name="Grid/MaxGroundHeight"            type="string" value="3"/>
         <!-- <param name="Grid/MinGroundHeight"            type="string" value="3"/> -->
         <param name="Grid/RangeMax"            type="string" value="10"/>
-
-
-
 
         <param name="Optimizer/GravitySigma"         type="string" value="0.3"/>
 
@@ -116,6 +115,18 @@
         <param name="Icp/PM"                         type="string" value="true"/>
         <param name="Icp/PMOutlierRatio"             type="string" value="0.7"/>
         <param name="Icp/CorrespondenceRatio"        type="string" value="$(arg loop_ratio)"/>
+
+        <!-- localization mode -->
+        <param if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false" />
+        <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true" />
+        <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)" />
+
+
+        <param name="gen_depth"                  type="bool"   value="$(arg gen_depth)" />
+        <param name="gen_depth_decimation"       type="int"    value="$(arg gen_depth_decimation)" />
+        <param name="gen_depth_fill_holes_size"  type="int"    value="$(arg gen_depth_fill_holes_size)" />
+        <param name="gen_depth_fill_iterations"  type="int"    value="$(arg gen_depth_fill_iterations)" />
+        <param name="gen_depth_fill_holes_error" type="double" value="$(arg gen_depth_fill_holes_error)" />
     </node>
 
 
@@ -139,7 +150,7 @@
         <param name="subscribe_scan_cloud" type="bool" value="true"/>
         <param name="approx_sync" type="bool" value="false"/>
         <remap from="scan_cloud" to="/lslidar_point_cloud/filtered"/>
-        <!-- <remap from="odom_info" to="odom_info"/> -->
+        <remap from="odom_info" to="odom_info"/>
      </node>
   </group>
 </launch>
